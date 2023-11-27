@@ -2,29 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Weapon : MonoBehaviour
+public class Weapon : Item
 {
-    public virtual void OnLeftMouseDown()
+    public virtual void WeaponUpdate()
     {
 
     }
 
-    public virtual void OnLeftMouseUp()
+    public virtual void OnPrimaryActionDown()
+    {
+
+    }
+
+    public virtual void OnPrimaryActionUp()
     {
 
     }
     
-    public virtual void OnRightMouseDown()
+    public virtual void OnSecondaryActionDown()
     {
 
     }
 
-    public virtual void OnRightMouseUp()
-    {
-
-    }
-
-    public virtual void WeaponSway()
+    public virtual void OnSecondaryActionUp()
     {
 
     }

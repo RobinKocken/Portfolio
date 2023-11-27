@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeaponData : ScriptableObject
+public interface IDamagable
 {
-    public string weaponName;
+    
 }

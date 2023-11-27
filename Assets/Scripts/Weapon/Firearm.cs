@@ -5,7 +5,12 @@ using UnityEngine;
 public class Firearm : Weapon
 {
 
-    public override void OnLeftMouseDown()
+    public override void InitializeItem()
+    {
+        
+    }
+
+    public override void OnPrimaryActionDown()
     {
         
     }
