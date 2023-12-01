@@ -8,6 +8,8 @@ public class ItemData : ScriptableObject
     public string itemName;
     [TextArea(5, 20)]
     public string itemDescription;
+    [Space]
+    public GameObject prefab;
 
     [Space]
 

@@ -5,17 +5,15 @@ using UnityEngine;
 public class WeaponManager : MonoBehaviour
 {
     [Header("Weapon Select")]
+    public Weapon currentWeapon;
     public WeaponSlot[] weaponSlot;
-    public Item selectedWeapon;
     public float currentScrollNum;
 
     [System.Serializable]
     public struct WeaponSlot
     {
-        public Item item;
-
+        public Weapon weapon;
         [Space]
-
         public ItemData.ItemType[] itemType;
     }
 
@@ -33,7 +31,7 @@ public class WeaponManager : MonoBehaviour
 
     void Update()
     {
-        
+        SelectWeapon();
     }
 
     void InitializeWeaponManager()
@@ -42,18 +40,25 @@ public class WeaponManager : MonoBehaviour
         {
             for(int j = 0; j < weaponSlot.Length; j++)
             {
-                if(weaponSlot[j].item == null)
+                if(weaponSlot[j].weapon == null)
                 {
-                    if(transform.GetChild(i).TryGetComponent<Item>(out Item item))
+                    if(transform.GetChild(i).TryGetComponent<Weapon>(out Weapon weapon))
                     {
-                        if(item.itemData != null && item.equipped == false)
+                        if(weapon.itemData != null && weapon.equipped == false)
                         {
                             for(int t = 0; t < weaponSlot[j].itemType.Length; t++)
                             {
-                                if(item.itemData.itemType == weaponSlot[j].itemType[t])
+                                if(weaponSlot[j].itemType[t] == weapon.itemData.itemType)
                                 {
-                                    weaponSlot[j].item = item;
-                                    item.equipped = true;
+                                    weaponSlot[j].weapon = weapon;
+                                    weapon.equipped = true;
+
+                                    transform.GetChild(i).transform.SetSiblingIndex(j);
+
+                                    if(j != Mathf.Abs((int)currentScrollNum))
+                                    {
+                                        weapon.gameObject.SetActive(false);
+                                    }
                                 }
                             }
                         }
@@ -68,17 +73,44 @@ public class WeaponManager : MonoBehaviour
         float oldScrollNum = currentScrollNum;
 
         currentScrollNum += Input.mouseScrollDelta.y;
-        currentScrollNum = Mathf.Clamp(currentScrollNum, -weaponSlot.Length - 1, 0);
+        currentScrollNum = Mathf.Clamp(currentScrollNum, -weaponSlot.Length + 1, 0);
 
         if(oldScrollNum != currentScrollNum)
         {
-            if(selectedWeapon != null)
+            if(currentWeapon != null)
             {
-                if(selectedWeapon.TryGetComponent<Weapon>(out Weapon weapon))
-                {
+                currentWeapon.gameObject.SetActive(false);
+                currentWeapon = null;
+            }
 
+            if(weaponSlot[Mathf.Abs((int)currentScrollNum)].weapon != null)
+            {
+                if(weaponSlot[Mathf.Abs((int)currentScrollNum)].weapon.TryGetComponent<Weapon>(out Weapon newWeapon))
+                {
+                    currentWeapon = newWeapon;
+                    currentWeapon.gameObject.SetActive(true);
                 }
             }
         }
+    }
+
+    public bool AddWeapon(Weapon weapon)
+    {
+        for(int i = 0; i < weaponSlot.Length; i++)
+        {
+            if(weaponSlot[i].weapon == null)
+            {
+                GameObject weaponObject = Instantiate(weapon.itemData.prefab, transform.position, Quaternion.identity, transform);
+
+                if(weaponObject.TryGetComponent<Weapon>(out Weapon newWeapon))
+                {
+                    weaponSlot[i].weapon = newWeapon;
+                }             
+
+                return true;
+            }
+        }
+
+        return false;
     }
 }
