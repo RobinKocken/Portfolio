@@ -32,6 +32,18 @@ public class WeaponManager : MonoBehaviour
     void Update()
     {
         SelectWeapon();
+
+        if(Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            currentWeapon.OnPrimaryActionDown();
+        }
+
+        if(Input.GetKeyUp(KeyCode.Mouse0))
+        {
+            currentWeapon.OnPrimaryActionUp();
+        }
+
+        currentWeapon.WeaponUpdate();
     }
 
     void InitializeWeaponManager()
@@ -43,28 +55,38 @@ public class WeaponManager : MonoBehaviour
                 if(weaponSlot[j].weapon == null)
                 {
                     if(transform.GetChild(i).TryGetComponent<Weapon>(out Weapon weapon))
-                    {
+                    {                       
                         if(weapon.itemData != null && weapon.equipped == false)
                         {
                             for(int t = 0; t < weaponSlot[j].itemType.Length; t++)
                             {
                                 if(weaponSlot[j].itemType[t] == weapon.itemData.itemType)
-                                {
+                                {                                  
                                     weaponSlot[j].weapon = weapon;
                                     weapon.equipped = true;
 
-                                    transform.GetChild(i).transform.SetSiblingIndex(j);
+                                    weapon.InitializeItem();
 
                                     if(j != Mathf.Abs((int)currentScrollNum))
                                     {
                                         weapon.gameObject.SetActive(false);
+
                                     }
+                                    else if(j == Mathf.Abs((int)currentScrollNum))
+                                    {
+                                        currentWeapon = weapon;
+                                    }                                    
                                 }
                             }
                         }
                     }
                 }
             }              
+        }
+
+        for(int i = 0; i < weaponSlot.Length; i++)
+        {
+            weaponSlot[i].weapon.transform.SetSiblingIndex(i);
         }
     }
 
@@ -105,6 +127,7 @@ public class WeaponManager : MonoBehaviour
                 if(weaponObject.TryGetComponent<Weapon>(out Weapon newWeapon))
                 {
                     weaponSlot[i].weapon = newWeapon;
+                    weaponSlot[i].weapon.InitializeItem();
                 }             
 
                 return true;

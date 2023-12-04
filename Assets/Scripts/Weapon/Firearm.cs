@@ -1,13 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Firearm : Weapon
 {
     [Space]
     [Header("Firearm Data")]
-    FirearmData firearmData;
+    public FirearmData firearmData;
     public float damage;
 
     [Space]
@@ -29,47 +28,73 @@ public class Firearm : Weapon
     [Space]
     [Header("Automatic Data")]
     public float fireRate;
-    float timeSinceLastShot;
     bool isAutomatic;
     bool canAutomatic = true;
 
     [Space]
     [Header("Burst Mode")]
     public float burstAmount;
+    public float timeBetweenBurst;
+    public float burstCooldown;
     bool isBursting;
     bool canBurst = true;
 
+    [Space]
+    [Header("Recoil Camera Rotation")]
+    Vector3 camCurrentRotation;
+    Vector3 camTargetRotation;
+
+    [Header("Recoil Firearm Rotation")]
+    Vector3 firearmCurrentRotation;
+    Vector3 firearmTargetRotation;
+
+    [Header("Recoil Firearm Position")]
+    Vector3 firearmCurrentPosition;
+    Vector3 firearmTargetPosition;
 
     public override void InitializeItem()
     {
-        if(itemData.GetComponent<FirearmData>() != null) 
-        {
-            firearmData = itemData.GetComponent<FirearmData>();
-        }
-        
+        SetFirearmData();
+    }
+
+    public override void WeaponUpdate()
+    {
+        SetPosAndRot();
     }
 
     public override void OnPrimaryActionDown()
     {
-        switch(firearmData.fireMode)
+        if(!isReloading && currentAmmo > 0)
         {
-            case FirearmData.FireMode.singleshot:
+            switch(firearmData.fireMode)
             {
-                break;
+                case FirearmData.FireMode.singleshot:
+                {
+                    if(CanShootSingleShoot())
+                        StartCoroutine(SingleShot());
+
+                    break;
+                }
+                case FirearmData.FireMode.automatic:
+                {
+                    if(CanShootAutomatic())
+                        StartCoroutine(Automatic());
+
+                    break;
+                }
+                case FirearmData.FireMode.burst:
+                {
+                    if(CanShootBurst())
+                        StartCoroutine(Burst());
+
+                    break;
+                }
+                default:
+                {
+                    return;
+                }
             }
-            case FirearmData.FireMode.automatic:
-            {
-                break;
-            }
-            case FirearmData.FireMode.burst:
-            {
-                break;
-            }
-            default:
-            {
-                return;
-            }
-        }
+        }        
     }
 
     public override void OnPrimaryActionUp()
@@ -108,7 +133,7 @@ public class Firearm : Weapon
 
     bool CanShootAutomatic() => !isAutomatic && canAutomatic;
 
-    IEnumerator Automtic()
+    IEnumerator Automatic()
     {
         isAutomatic = true;
         canAutomatic = false;
@@ -124,6 +149,24 @@ public class Firearm : Weapon
         isAutomatic = false;
     }
 
+    bool CanShootBurst() => !isBursting && canBurst;
+
+    IEnumerator Burst()
+    {
+        for(int i = 0; i < burstAmount; i++)
+        {
+            if(currentAmmo <= 0)
+                break;
+
+            Shoot();
+            Recoil();
+
+            yield return new WaitForSeconds(timeBetweenBurst);
+        }
+
+        yield return new WaitForSeconds(0);
+        isBursting = false;
+    }
 
     void Shoot()
     {
@@ -140,6 +183,41 @@ public class Firearm : Weapon
 
     void Recoil()
     {
+        camTargetRotation += new Vector3(firearmData.camRecoil.x, Random.Range(-firearmData.camRecoil.y, firearmData.camRecoil.y), Random.Range(-firearmData.camRecoil.z, firearmData.camRecoil.z));
+        firearmTargetRotation += new Vector3(firearmData.firearmRecoil.x, Random.Range(-firearmData.firearmRecoil.y, firearmData.firearmRecoil.y), Random.Range(-firearmData.firearmRecoil.z, firearmData.firearmRecoil.z));
+        firearmTargetPosition = new Vector3(firearmData.localPlacmentPos.x, firearmData.localPlacmentPos.y, firearmData.firearmRecoilBackUp + firearmData.localPlacmentPos.z);
+    }
 
+    void SetPosAndRot()
+    {
+        camTargetRotation = Vector3.Lerp(camTargetRotation, Vector3.zero, firearmData.camReturnSpeed * Time.deltaTime);
+        camCurrentRotation = Vector3.Lerp(camCurrentRotation, camTargetRotation, firearmData.camSnappiness * Time.deltaTime);
+
+        firearmTargetRotation = Vector3.Lerp(firearmTargetRotation, Vector3.zero, firearmData.firearmReturnSpeed * Time.deltaTime);
+        firearmCurrentRotation = Vector3.Lerp(firearmCurrentRotation, firearmTargetRotation, firearmData.firearmSnappiness * Time.deltaTime);
+
+        firearmTargetPosition = Vector3.Lerp(firearmTargetPosition, firearmData.localPlacmentPos, firearmData.backUpReturnSpeed * Time.deltaTime);
+        firearmCurrentPosition = Vector3.Lerp(firearmCurrentPosition, firearmTargetPosition, firearmData.backUpSnappiness * Time.deltaTime);
+
+        Camera.main.transform.localRotation = Quaternion.Euler(camCurrentRotation);
+        transform.localRotation = Quaternion.Euler(firearmCurrentRotation);
+        transform.localPosition = firearmCurrentPosition;
+    }
+
+    void SetFirearmData()
+    {
+        firearmCurrentPosition = firearmData.localPlacmentPos;
+
+        damage = firearmData.baseDamage;
+
+        maxAmmo = firearmData.baseMaxAmmo;
+        currentAmmo = maxAmmo;
+
+        singleShotCooldown = firearmData.baseSingleShotCooldown;
+        fireRate = firearmData.baseFireRate;
+
+        burstAmount = firearmData.baseBurstAmount;
+        timeBetweenBurst = firearmData.baseTimeBetweenBurst;
+        burstCooldown = firearmData.baseBurstCooldown;
     }
 }
