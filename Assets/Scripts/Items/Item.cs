@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Item : MonoBehaviour
 {
+    [Header("General")]
     public ItemData itemData;
     public bool equipped;
 
