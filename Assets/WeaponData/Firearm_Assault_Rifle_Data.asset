@@ -30,12 +30,12 @@ MonoBehaviour:
   baseBurstCooldown: 0.5
   swayClamp: 0.0015
   smoothing: 5
-  camRecoil: {x: -3, y: -0.2, z: -0.2}
+  camRecoil: {x: -2, y: -0.2, z: -0.2}
   camSnappiness: 10
-  camReturnSpeed: 5
-  firearmRecoil: {x: -2.5, y: 0, z: 0}
-  firearmSnappiness: 10
-  firearmReturnSpeed: 20
-  firearmRecoilBackUp: -0.6
+  camReturnSpeed: 60
+  firearmRecoil: {x: 0, y: 0, z: 2}
+  firearmSnappiness: 40
+  firearmReturnSpeed: 60
+  firearmRecoilBackUp: -0.1
   backUpSnappiness: 20
-  backUpReturnSpeed: 30
+  backUpReturnSpeed: 60
