@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class Firearm : Weapon
 {
@@ -18,6 +19,7 @@ public class Firearm : Weapon
     [Header("Reload Data")]
     public float reloadTime;
     bool isReloading;
+    bool canReload = true;
 
     [Space]
     [Header("Single Shot Data")]
@@ -44,10 +46,12 @@ public class Firearm : Weapon
     Vector3 camCurrentRotation;
     Vector3 camTargetRotation;
 
+    [Space]
     [Header("Recoil Firearm Rotation")]
     Vector3 firearmCurrentRotation;
     Vector3 firearmTargetRotation;
 
+    [Space]
     [Header("Recoil Firearm Position")]
     Vector3 firearmCurrentPosition;
     Vector3 firearmTargetPosition;
@@ -64,7 +68,7 @@ public class Firearm : Weapon
 
     public override void OnPrimaryActionDown()
     {
-        if(!isReloading && currentAmmo > 0)
+        if(currentAmmo > 0)
         {
             switch(firearmData.fireMode)
             {
@@ -102,11 +106,13 @@ public class Firearm : Weapon
         canSingleShoot = true;
         canAutomatic = true;
         canBurst = true;
+        canReload = true;
     }
 
+    public bool CanReload() => !isReloading && !isBursting;
     public bool IsReloading() => isReloading;
 
-    IEnumerator Reloading()
+    public IEnumerator Reloading()
     {
         isReloading = true;
 
@@ -124,6 +130,9 @@ public class Firearm : Weapon
         isSingleShooting = true;
         canSingleShoot = false;
 
+        if(IsReloading())
+            yield return new WaitForSeconds(reloadTime);
+
         Shoot();
         Recoil();
 
@@ -140,10 +149,16 @@ public class Firearm : Weapon
 
         while(!canAutomatic)
         {
+            if(currentAmmo <= 0)
+                break;
+
+            if(IsReloading())
+                yield return new WaitForSeconds(reloadTime);
+
             Recoil();
             Shoot();
 
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(1 / (fireRate / 60));
         }
 
         isAutomatic = false;
@@ -153,10 +168,16 @@ public class Firearm : Weapon
 
     IEnumerator Burst()
     {
+        isBursting = true;
+        canBurst = false;
+
         for(int i = 0; i < burstAmount; i++)
         {
             if(currentAmmo <= 0)
                 break;
+
+            if(IsReloading())
+                yield return new WaitForSeconds(reloadTime);
 
             Shoot();
             Recoil();
@@ -164,7 +185,6 @@ public class Firearm : Weapon
             yield return new WaitForSeconds(timeBetweenBurst);
         }
 
-        yield return new WaitForSeconds(0);
         isBursting = false;
     }
 
@@ -174,11 +194,25 @@ public class Firearm : Weapon
         {
             if(hit.transform.TryGetComponent<IDamagable>(out IDamagable damagable))
             {
-                
+                damagable.Damagable(damage);
             }
         }
 
         currentAmmo--;
+    }
+
+    public override Vector3 Sway(Vector3 pos)
+    {
+        Vector2 input = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+
+        input.x = Mathf.Clamp(input.x, -firearmData.swayClamp, firearmData.swayClamp);
+        input.y = Mathf.Clamp(input.y, -firearmData.swayClamp, firearmData.swayClamp);
+
+        Vector3 target = new Vector3(input.x, input.y, 0);
+
+        Vector3 newPos = Vector3.Lerp(pos, target + Vector3.zero, Time.deltaTime * firearmData.smoothing);
+
+        return newPos;
     }
 
     void Recoil()
@@ -213,11 +247,24 @@ public class Firearm : Weapon
         maxAmmo = firearmData.baseMaxAmmo;
         currentAmmo = maxAmmo;
 
+        reloadTime = firearmData.reloadTime;
+
         singleShotCooldown = firearmData.baseSingleShotCooldown;
         fireRate = firearmData.baseFireRate;
 
         burstAmount = firearmData.baseBurstAmount;
         timeBetweenBurst = firearmData.baseTimeBetweenBurst;
         burstCooldown = firearmData.baseBurstCooldown;
+    }
+
+    public override void OnWeaponSwitch()
+    {
+        StopAllCoroutines();
+
+        isSingleShooting = false;
+        isAutomatic = false;
+        isBursting = false;
+
+        OnPrimaryActionUp();
     }
 }

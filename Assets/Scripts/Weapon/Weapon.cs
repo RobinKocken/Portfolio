@@ -28,4 +28,14 @@ public class Weapon : Item
     {
 
     }
+
+    public virtual Vector3 Sway(Vector3 pos)
+    {
+        return Vector3.zero;
+    }
+
+    public virtual void OnWeaponSwitch()
+    {
+
+    }
 }

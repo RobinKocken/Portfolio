@@ -23,19 +23,20 @@ MonoBehaviour:
   baseDamage: 25
   raycastLength: 1000
   baseMaxAmmo: 30
+  reloadTime: 1
   baseSingleShotCooldown: 0.5
-  baseFireRate: 60
-  baseBurstAmount: 3
+  baseFireRate: 480
+  baseBurstAmount: 10
   baseTimeBetweenBurst: 0.2
   baseBurstCooldown: 0.5
-  swayClamp: 0.0015
-  smoothing: 5
-  camRecoil: {x: -2, y: -0.2, z: -0.2}
+  swayClamp: 0.015
+  smoothing: 2
+  camRecoil: {x: -2, y: 0.2, z: 2}
   camSnappiness: 10
   camReturnSpeed: 60
-  firearmRecoil: {x: 0, y: 0, z: 2}
+  firearmRecoil: {x: 0, y: 0, z: 3}
   firearmSnappiness: 40
   firearmReturnSpeed: 60
-  firearmRecoilBackUp: -0.1
+  firearmRecoilBackUp: -0.3
   backUpSnappiness: 20
   backUpReturnSpeed: 60

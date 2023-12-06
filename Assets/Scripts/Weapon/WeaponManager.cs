@@ -33,6 +33,16 @@ public class WeaponManager : MonoBehaviour
     {
         SelectWeapon();
 
+        if(currentWeapon != null)
+        {
+            PlayerInput();
+            currentWeapon.WeaponUpdate();
+            transform.localPosition = currentWeapon.Sway(transform.localPosition);
+        }
+    }
+
+    void PlayerInput()
+    {
         if(Input.GetKeyDown(KeyCode.Mouse0))
         {
             currentWeapon.OnPrimaryActionDown();
@@ -43,7 +53,16 @@ public class WeaponManager : MonoBehaviour
             currentWeapon.OnPrimaryActionUp();
         }
 
-        currentWeapon.WeaponUpdate();
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            if(currentWeapon.transform.TryGetComponent<Firearm>(out Firearm firearm))
+            {
+                if(firearm.CanReload())
+                {
+                    StartCoroutine(firearm.Reloading());
+                }
+            }            
+        }
     }
 
     void InitializeWeaponManager()
@@ -86,7 +105,10 @@ public class WeaponManager : MonoBehaviour
 
         for(int i = 0; i < weaponSlot.Length; i++)
         {
-            weaponSlot[i].weapon.transform.SetSiblingIndex(i);
+            if(weaponSlot[i].weapon != null)
+            {
+                weaponSlot[i].weapon.transform.SetSiblingIndex(i);
+            }
         }
     }
 
@@ -101,6 +123,7 @@ public class WeaponManager : MonoBehaviour
         {
             if(currentWeapon != null)
             {
+                currentWeapon.OnWeaponSwitch();
                 currentWeapon.gameObject.SetActive(false);
                 currentWeapon = null;
             }

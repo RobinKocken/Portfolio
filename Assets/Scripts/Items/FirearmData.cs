@@ -27,6 +27,10 @@ public class FirearmData : WeaponData
     public int baseMaxAmmo;
 
     [Space]
+    [Header("Reload Data")]
+    public float reloadTime;
+
+    [Space]
     [Header("Single Shot Data")]
     public float baseSingleShotCooldown;
 
