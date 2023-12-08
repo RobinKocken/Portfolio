@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Weapon : Item
 {
+    public bool equipped;
+
     public virtual void WeaponUpdate()
     {
 

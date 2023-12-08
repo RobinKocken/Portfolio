@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "FirearmData", menuName = "Firearm Data", order = 0)]
+[CreateAssetMenu(fileName = "FirearmData", menuName = "Firearm Data", order = 1)]
 public class FirearmData : WeaponData
 {
     [Space]
