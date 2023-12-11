@@ -1,90 +1,108 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class InventoryManager : MonoBehaviour
 {
     [Header("Inventory Data")]
-    public InventoryHolder[] inventoryHolder;
+    public GameObject inventoryHolder;
+    public Holder[] holder;
 
     [System.Serializable]
-    public struct InventoryHolder
+    public struct Holder
     {
-        public Transform holder;
+        public Transform slotHolder;
         [Space]
         public ItemData.ItemType[] itemType;
         [Space]
-        public List<InventorySlot> inventorySlot;
+        public List<InventorySlot> slot;
     }
 
     [Space]
     [Header("Mouse Data")]
-    public ItemData itemDataHolder;
-    public int itemAmountHolder;
-    [Space]
-    public Vector2 offset;
-    [Space]
-    public Transform cursor;
-    public Image cursorIconRenderer;
-    public TMP_Text cursorAmountText;
+    public CursorHolder cursorHolder;
+
+    [System.Serializable]
+    public struct CursorHolder
+    {
+        public ItemData itemData;
+        public int itemAmount;
+        [Space]
+        public Vector3 offset;
+        [Space]
+        public Transform cursor;
+        public Image cursorIconRenderer;
+        public TMP_Text cursorAmountText;
+    }
 
     void Start()
     {
         InitializeSlots();
+        inventoryHolder.SetActive(false);
+    }
+
+    void Update()
+    {
+        if(Input.GetKeyUp(KeyCode.Tab))
+        {
+            bool active = inventoryHolder.activeSelf;
+            Debug.Log(active);
+            inventoryHolder.SetActive(!active);
+        }
+
+        CursorTracking();
     }
 
     void InitializeSlots()
     {
-        for(int i = 0; i < inventoryHolder.Length; i++)
+        for(int i = 0; i < holder.Length; i++)
         {
-            if(inventoryHolder[i].holder != null)
+            if(holder[i].slotHolder != null)
             {
-                for(int j = 0; j < inventoryHolder[i].holder.childCount; j++)
+                for(int j = 0; j < holder[i].slotHolder.childCount; j++)
                 {
-                    if(inventoryHolder[i].holder.GetChild(j).TryGetComponent<InventorySlot>(out InventorySlot inventorySlot))
+                    if(holder[i].slotHolder.GetChild(j).TryGetComponent<InventorySlot>(out InventorySlot inventorySlot))
                     {
-                        inventorySlot.slotID = j;
-                        inventorySlot.holderID = i;
-                        inventorySlot.InitializeItem();
-                        inventoryHolder[i].inventorySlot.Add(inventorySlot);
+                        inventorySlot.InitializeSlot(this, j, i);
+                        holder[i].slot.Add(inventorySlot);
                     }
                 }
             }
         }
     }
 
-    public void AddItem(ItemData itemData, int itemAmount)
+    public int AddItem(ItemData itemData, int itemAmount)
     {
-        for(int i = 0; i < inventoryHolder.Length; i++)
+        for(int i = 0; i < holder.Length; i++)
         {
-            for(int j = 0; j < inventoryHolder[i].itemType.Length; j++)
+            for(int j = 0; j < holder[i].itemType.Length; j++)
             {
-                if(inventoryHolder[i].itemType[j] == itemData.itemType)
+                if(holder[i].itemType[j] == itemData.itemType)
                 {
-                    for(int s = 0; s < inventoryHolder[i].inventorySlot.Count; s++)
+                    for(int s = 0; s < holder[i].slot.Count; s++)
                     {
-                        if(inventoryHolder[i].inventorySlot[s].itemData != null)
+                        if(holder[i].slot[s].itemData != null)
                         {
-                            if(inventoryHolder[i].inventorySlot[s].itemData == itemData)
+                            if(holder[i].slot[s].itemData == itemData)
                             {
                                 if(itemData.maxAmount <= -1)
                                 {
-                                    inventoryHolder[i].inventorySlot[s].AddAmount(itemData, itemAmount);
-                                    return;
+                                    holder[i].slot[s].AddAmount(itemData, itemAmount);
+                                    return itemAmount;
                                 }
-                                else if(itemAmount <= itemData.maxAmount - inventoryHolder[i].inventorySlot[s].itemAmount)
+                                else if(itemAmount <= itemData.maxAmount - holder[i].slot[s].itemAmount)
                                 {
-                                    inventoryHolder[i].inventorySlot[s].AddAmount(itemData, itemAmount);
-                                    return;
+                                    holder[i].slot[s].AddAmount(itemData, itemAmount);
+                                    return itemAmount;
                                 }
-                                else if(itemAmount > itemData.maxAmount - inventoryHolder[i].inventorySlot[s].itemAmount)
+                                else if(itemAmount > itemData.maxAmount - holder[i].slot[s].itemAmount)
                                 {
-                                    int maxAmount = itemData.maxAmount - inventoryHolder[i].inventorySlot[s].itemAmount;
+                                    int maxAmount = itemData.maxAmount - holder[i].slot[s].itemAmount;
                                     itemAmount -= maxAmount;
 
-                                    inventoryHolder[i].inventorySlot[s].AddAmount(itemData, maxAmount);
+                                    holder[i].slot[s].AddAmount(itemData, maxAmount);
 
                                     continue;
                                 }
@@ -95,63 +113,161 @@ public class InventoryManager : MonoBehaviour
             }
         }
 
-        for(int i = 0; i < inventoryHolder.Length; i++)
+        for(int i = 0; i < holder.Length; i++)
         {
-            for(int j = 0; j < inventoryHolder[i].itemType.Length; j++)
+            for(int j = 0; j < holder[i].itemType.Length; j++)
             {
-                if(inventoryHolder[i].itemType[j] == itemData.itemType)
+                if(holder[i].itemType[j] == itemData.itemType)
                 {
-                    for(int s = 0; s < inventoryHolder[i].inventorySlot.Count; s++)
+                    for(int s = 0; s < holder[i].slot.Count; s++)
                     {
-                        if(inventoryHolder[i].inventorySlot[s].itemData == null)
+                        if(holder[i].slot[s].itemData == null)
                         {
-                            if(itemAmount <= itemData.maxAmount - inventoryHolder[i].inventorySlot[s].itemAmount)
+                            if(itemAmount <= itemData.maxAmount - holder[i].slot[s].itemAmount)
                             {
-                                inventoryHolder[i].inventorySlot[s].SetItem(itemData, itemAmount);
-                                return;
+                                holder[i].slot[s].SetItem(itemData, itemAmount);
+                                return itemAmount;
                             }
-                            else if(itemAmount > itemData.maxAmount - inventoryHolder[i].inventorySlot[s].itemAmount)
+                            else if(itemAmount > itemData.maxAmount - holder[i].slot[s].itemAmount)
                             {
-                                int maxAmount = itemData.maxAmount - inventoryHolder[i].inventorySlot[s].itemAmount;
+                                int maxAmount = itemData.maxAmount - holder[i].slot[s].itemAmount;
                                 itemAmount -= maxAmount;
 
-                                inventoryHolder[i].inventorySlot[s].SetItem(itemData, itemAmount);
+                                holder[i].slot[s].SetItem(itemData, itemAmount);
 
-                                AddItem(itemData, itemAmount);
-                                return;
+                                //AddItem(itemData, itemAmount);
+                                //return;
+                                continue;
                             }
                         }
                     }
                 }
             }
         }
+
+        return itemAmount;
     }
 
-    public void RemoveItem(ItemData itemData, int itemAmount, int slotID, int holderID)
+    public int RemoveItem(ItemData itemData, int itemAmount, int slotID, int holderID)
     {
         if(slotID > -1 && holderID > -1)
         {
-            if(inventoryHolder[holderID].inventorySlot[slotID].itemData != null)
+            if(holder[holderID].slot[slotID].itemData != null)
             {
-                if(itemAmount <= inventoryHolder[holderID].inventorySlot[slotID].itemAmount)
+                if(itemAmount <= holder[holderID].slot[slotID].itemAmount)
                 {
-                    inventoryHolder[holderID].inventorySlot[slotID].RemoveAmount(itemAmount);
+                    holder[holderID].slot[slotID].RemoveAmount(itemAmount);
 
-                    return;
+                    return itemAmount;
                 }
-                else if(itemAmount > inventoryHolder[holderID].inventorySlot[slotID].itemAmount)
+                else if(itemAmount > holder[holderID].slot[slotID].itemAmount)
                 {
-                    int maxAmount = inventoryHolder[holderID].inventorySlot[slotID].itemAmount;
-                    inventoryHolder[holderID].inventorySlot[slotID].RemoveAmount(maxAmount);
+                    int maxAmount = holder[holderID].slot[slotID].itemAmount;
+                    holder[holderID].slot[slotID].RemoveAmount(maxAmount);
 
-                    return;
+                    return itemAmount;
                 }
             }
         }
         
-        for(int i = 0; i < inventoryHolder.Length; i++)
+        for(int i = 0; i < holder.Length; i++)
         {
+            for(int s = 0; s < holder[i].slot.Count; s++)
+            {
+                if(holder[i].slot[s].itemData != null)
+                {
+                    if(holder[i].slot[s].itemData == itemData)
+                    {
+                        if(itemAmount <= holder[i].slot[s].itemAmount)
+                        {
+                            holder[i].slot[s].RemoveAmount(itemAmount);
 
+                            return itemAmount;
+                        }
+                        else if(itemAmount > holder[i].slot[s].itemAmount)
+                        {
+                            int maxAmount = holder[holderID].slot[slotID].itemAmount;
+                            itemAmount -= maxAmount;
+
+                            holder[holderID].slot[slotID].RemoveAmount(maxAmount);
+
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+
+        return itemAmount;
+    }
+
+    public void PickUpDropItems(int SlotID, int holderID)
+    {
+        if(cursorHolder.itemData == null)
+        {
+            if(holder[holderID].slot[SlotID].itemData != null)
+            {
+                AddItemToCursor(holder[holderID].slot[SlotID].itemData, holder[holderID].slot[SlotID].itemAmount);
+                holder[holderID].slot[SlotID].RemoveAmount(holder[holderID].slot[SlotID].itemAmount);
+            }
+        }
+        else if(cursorHolder.itemData != null)
+        {
+            if(holder[holderID].slot[SlotID].itemData == null)
+            {
+                holder[holderID].slot[SlotID].AddAmount(cursorHolder.itemData, cursorHolder.itemAmount);
+                RemoveItemFromCursor(cursorHolder.itemAmount);
+            }
+            else if(holder[holderID].slot[SlotID].itemData != null)
+            {
+                if(cursorHolder.itemAmount <= holder[holderID].slot[SlotID].itemData.maxAmount - holder[holderID].slot[SlotID].itemAmount)
+                {
+                    holder[holderID].slot[SlotID].AddAmount(cursorHolder.itemData, cursorHolder.itemAmount);
+                    RemoveItemFromCursor(cursorHolder.itemAmount);
+                    Debug.Log("All Amount");
+                }
+                else if(cursorHolder.itemAmount > holder[holderID].slot[SlotID].itemData.maxAmount - holder[holderID].slot[SlotID].itemAmount)
+                {
+                    int maxAmount = holder[holderID].slot[SlotID].itemData.maxAmount - holder[holderID].slot[SlotID].itemAmount;
+                    RemoveItemFromCursor(maxAmount);
+                    holder[holderID].slot[SlotID].AddAmount(cursorHolder.itemData, maxAmount);
+                    Debug.Log("Some Amount");
+                }
+            }
+        }
+    }
+
+    void CursorTracking()
+    {
+        cursorHolder.cursor.position = Input.mousePosition + cursorHolder.offset;
+    }
+
+    void AddItemToCursor(ItemData itemData, int itemAmount)
+    {
+        cursorHolder.itemData = itemData;
+        cursorHolder.itemAmount = itemAmount;
+
+        cursorHolder.cursor.gameObject.SetActive(true);
+
+        cursorHolder.cursorIconRenderer.sprite = itemData.icon;
+        cursorHolder.cursorAmountText.text = itemAmount.ToString();
+    }
+
+    void RemoveItemFromCursor(int itemAmount)
+    {
+        if(cursorHolder.itemAmount - itemAmount == 0)
+        {
+            cursorHolder.itemData = null;
+            cursorHolder.itemAmount = 0;
+
+            cursorHolder.cursor.gameObject.SetActive(false);
+
+            cursorHolder.cursorIconRenderer.sprite = null;
+            cursorHolder.cursorAmountText.text = 0.ToString();
+        }
+        else if(cursorHolder.itemAmount - itemAmount > 0)
+        {
+            cursorHolder.itemAmount -= itemAmount;
         }
     }
 }

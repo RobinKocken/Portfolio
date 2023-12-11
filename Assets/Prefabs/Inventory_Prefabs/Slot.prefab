@@ -262,11 +262,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03bd09618e2555846a7914f0213508f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inventoryManager: {fileID: 0}
   itemData: {fileID: 0}
   itemAmount: 0
   slotID: 0
+  holderID: 0
   iconRenderer: {fileID: 1187269484610059891}
-  amounText: {fileID: 9148117025178514988}
+  amountText: {fileID: 9148117025178514988}
 --- !u!222 &4394310611448251204
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -348,4 +350,16 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1514593676487406356}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5202393436722529264}
+        m_TargetAssemblyTypeName: InventorySlot, Assembly-CSharp
+        m_MethodName: SelectSlot
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

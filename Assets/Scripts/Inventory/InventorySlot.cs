@@ -7,6 +7,7 @@ using TMPro;
 public class InventorySlot : MonoBehaviour
 {
     [Header("Item Data")]
+    public InventoryManager inventoryManager;
     public ItemData itemData;
     public int itemAmount;
 
@@ -18,8 +19,17 @@ public class InventorySlot : MonoBehaviour
     public Image iconRenderer;
     public TMP_Text amountText;
 
-    public void InitializeItem()
+    public void SelectSlot()
     {
+        inventoryManager.PickUpDropItems(slotID, holderID);
+    }
+
+    public void InitializeSlot(InventoryManager inventoryManager, int slotID, int holderID)
+    {
+        this.inventoryManager = inventoryManager;
+        this.slotID = slotID;
+        this.holderID = holderID;
+
         if(itemData != null)
         {
             iconRenderer.sprite = itemData.icon;
