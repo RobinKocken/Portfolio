@@ -1,31 +1,49 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerCamera : MonoBehaviour
 {
+    PlayerInput input;
+
     public Transform orientation;
 
     public float mouseSens;
 
-    float mouseX;
-    float mouseY;
-
+    Vector2 mouse;
     float xRotation;
     float yRotation;
+
+    void Start()
+    {
+        input = new PlayerInput();
+        input.Player.Enable();
+        input.Player.Mouse.performed += OnCamPerformed;
+        input.Player.Mouse.canceled += OnCamCancelled;
+    }
 
     void Update()
     {
         FPCamera();
     }
 
+    void OnCamPerformed(InputAction.CallbackContext context)
+    {
+
+    }
+
+    void OnCamCancelled(InputAction.CallbackContext context)
+    {
+
+    }
+
     void FPCamera()
     {
-        mouseX = Input.GetAxis("Mouse X") * mouseSens;
-        mouseY = Input.GetAxis("Mouse Y") * mouseSens;
+        mouse = input.Player.Mouse.ReadValue<Vector2>();
 
-        xRotation += -mouseY;
-        yRotation += mouseX;
+        xRotation += -mouse.y;
+        yRotation += mouse.x;
 
         xRotation = Mathf.Clamp(xRotation, -90, 90);
 

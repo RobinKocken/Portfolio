@@ -47,8 +47,8 @@ public class InventoryManager : MonoBehaviour
 
         input = new PlayerInput();
         input.Player.Enable();
-        //input.Player.Inventory.performed += OnInventoryPerformed;
-        input.Player.Inventory.canceled += OnInventoryCancelled;
+        input.Player.Inventory.performed += OnInventoryPerformed;
+        //input.Player.Inventory.canceled += OnInventoryCancelled;
     }
 
     void Update()
@@ -58,8 +58,12 @@ public class InventoryManager : MonoBehaviour
 
     void OnInventoryPerformed(InputAction.CallbackContext context)
     {
-        CursorManager.Unlock();
-        inventoryHolder.SetActive(true);
+        bool active = inventoryHolder.activeSelf;
+
+        if(active) CursorManager.Lock();
+        else if(!active) CursorManager.Unlock();
+
+        inventoryHolder.SetActive(!active);
     }
 
     void OnInventoryCancelled(InputAction.CallbackContext context)
