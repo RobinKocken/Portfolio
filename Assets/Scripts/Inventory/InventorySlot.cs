@@ -32,11 +32,11 @@ public class InventorySlot : MonoBehaviour
 
         if(itemData != null)
         {
-            iconRenderer.sprite = itemData.icon;
-            amountText.text = itemAmount.ToString();
-
-            iconRenderer.sprite = itemData.icon;
-            amountText.text = this.itemAmount.ToString();
+            SetItem(itemData, itemAmount);
+        }
+        else if(itemData == null)
+        {
+            amountText.gameObject.SetActive(false);
         }
     }
 
@@ -47,6 +47,8 @@ public class InventorySlot : MonoBehaviour
 
         iconRenderer.sprite = itemData.icon;
         amountText.text = this.itemAmount.ToString();
+
+        amountText.gameObject.SetActive(true);
     }
 
     public void AddAmount(ItemData itemData ,int itemAmount)
@@ -82,5 +84,7 @@ public class InventorySlot : MonoBehaviour
 
         iconRenderer.sprite = null;
         amountText.text = itemAmount.ToString();
+
+        amountText.gameObject.SetActive(false);
     }
 }

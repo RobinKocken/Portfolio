@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.InputSystem;
 
 public class InventoryManager : MonoBehaviour
 {
+    PlayerInput input;
+
     [Header("Inventory Data")]
     public GameObject inventoryHolder;
     public Holder[] holder;
@@ -41,18 +44,28 @@ public class InventoryManager : MonoBehaviour
     {
         InitializeSlots();
         inventoryHolder.SetActive(false);
+
+        input = new PlayerInput();
+        input.Player.Enable();
+        //input.Player.Inventory.performed += OnInventoryPerformed;
+        input.Player.Inventory.canceled += OnInventoryCancelled;
     }
 
     void Update()
     {
-        if(Input.GetKeyUp(KeyCode.Tab))
-        {
-            bool active = inventoryHolder.activeSelf;
-            Debug.Log(active);
-            inventoryHolder.SetActive(!active);
-        }
-
         CursorTracking();
+    }
+
+    void OnInventoryPerformed(InputAction.CallbackContext context)
+    {
+        CursorManager.Unlock();
+        inventoryHolder.SetActive(true);
+    }
+
+    void OnInventoryCancelled(InputAction.CallbackContext context)
+    {
+        bool active = inventoryHolder.activeSelf;
+        inventoryHolder.SetActive(!active);
     }
 
     void InitializeSlots()
@@ -213,25 +226,31 @@ public class InventoryManager : MonoBehaviour
         }
         else if(cursorHolder.itemData != null)
         {
-            if(holder[holderID].slot[SlotID].itemData == null)
+            for(int i = 0; i < holder[holderID].itemType.Length; i++)
             {
-                holder[holderID].slot[SlotID].AddAmount(cursorHolder.itemData, cursorHolder.itemAmount);
-                RemoveItemFromCursor(cursorHolder.itemAmount);
-            }
-            else if(holder[holderID].slot[SlotID].itemData != null)
-            {
-                if(cursorHolder.itemAmount <= holder[holderID].slot[SlotID].itemData.maxAmount - holder[holderID].slot[SlotID].itemAmount)
+                if(holder[holderID].itemType[i] == cursorHolder.itemData.itemType)
                 {
-                    holder[holderID].slot[SlotID].AddAmount(cursorHolder.itemData, cursorHolder.itemAmount);
-                    RemoveItemFromCursor(cursorHolder.itemAmount);
-                    Debug.Log("All Amount");
-                }
-                else if(cursorHolder.itemAmount > holder[holderID].slot[SlotID].itemData.maxAmount - holder[holderID].slot[SlotID].itemAmount)
-                {
-                    int maxAmount = holder[holderID].slot[SlotID].itemData.maxAmount - holder[holderID].slot[SlotID].itemAmount;
-                    RemoveItemFromCursor(maxAmount);
-                    holder[holderID].slot[SlotID].AddAmount(cursorHolder.itemData, maxAmount);
-                    Debug.Log("Some Amount");
+                    if(holder[holderID].slot[SlotID].itemData == null)
+                    {
+                        holder[holderID].slot[SlotID].AddAmount(cursorHolder.itemData, cursorHolder.itemAmount);
+                        RemoveItemFromCursor(cursorHolder.itemAmount);
+                    }
+                    else if(holder[holderID].slot[SlotID].itemData != null)
+                    {
+                        if(cursorHolder.itemAmount <= holder[holderID].slot[SlotID].itemData.maxAmount - holder[holderID].slot[SlotID].itemAmount)
+                        {
+                            holder[holderID].slot[SlotID].AddAmount(cursorHolder.itemData, cursorHolder.itemAmount);
+                            RemoveItemFromCursor(cursorHolder.itemAmount);
+                            Debug.Log("All Amount");
+                        }
+                        else if(cursorHolder.itemAmount > holder[holderID].slot[SlotID].itemData.maxAmount - holder[holderID].slot[SlotID].itemAmount)
+                        {
+                            int maxAmount = holder[holderID].slot[SlotID].itemData.maxAmount - holder[holderID].slot[SlotID].itemAmount;
+                            RemoveItemFromCursor(maxAmount);
+                            holder[holderID].slot[SlotID].AddAmount(cursorHolder.itemData, maxAmount);
+                            Debug.Log("Some Amount");
+                        }
+                    }
                 }
             }
         }
@@ -268,6 +287,8 @@ public class InventoryManager : MonoBehaviour
         else if(cursorHolder.itemAmount - itemAmount > 0)
         {
             cursorHolder.itemAmount -= itemAmount;
+
+            cursorHolder.cursorAmountText.text = cursorHolder.itemAmount.ToString();
         }
     }
 }

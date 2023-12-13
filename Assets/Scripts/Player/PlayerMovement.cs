@@ -1,25 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public PlayerInput input;
+
     Rigidbody rb;
 
     public int speed;
     public float drag;
 
-    float moveZ;
-    float moveX;
+    public Vector2 move;
 
     void Start()
     {
+        input = new PlayerInput();
+        input.Player.Enable();
+        input.Player.Movement.performed += OnMovePerformed;
+        input.Player.Movement.canceled += OnMoveCancelled;
+
         rb = GetComponent<Rigidbody>();
+    }
+
+    void OnMovePerformed(InputAction.CallbackContext value)
+    {
+        move = value.ReadValue<Vector2>();
+    }
+
+    void OnMoveCancelled(InputAction.CallbackContext value)
+    {
+        move = value.ReadValue<Vector2>();
     }
 
     void Update()
     {
-        PlayerInput();
         SpeedControl();
     }
 
@@ -28,16 +44,10 @@ public class PlayerMovement : MonoBehaviour
         Movement();
     }
 
-    void PlayerInput()
-    {
-        moveZ = Input.GetAxisRaw("Vertical");
-        moveX = Input.GetAxisRaw("Horizontal");
-    }
-
     void Movement()
     {
-        rb.AddForce(moveZ * speed * transform.forward, ForceMode.Force);
-        rb.AddForce(moveX * speed * transform.right, ForceMode.Force);
+        rb.AddForce(move.y * speed * transform.forward, ForceMode.Force);
+        rb.AddForce(move.x * speed * transform.right, ForceMode.Force);
 
         rb.drag = drag;
     }
