@@ -1,17 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.InputSystem;
 
 public class InventoryManager : MonoBehaviour
 {
+    [Header("References")]
     PlayerInput input;
+    public WeaponManager weaponManager;
 
+    [Space]
     [Header("Inventory Data")]
     public GameObject inventoryHolder;
     public Holder[] holder;
+    public WeaponSlot[] weaponSlot;
 
     [System.Serializable]
     public struct Holder
@@ -23,7 +27,14 @@ public class InventoryManager : MonoBehaviour
         public List<InventorySlot> slot;
     }
 
-    [Space]
+    [System.Serializable]
+    public struct WeaponSlot
+    {
+        public InventorySlot slot;
+        [Space]
+        public ItemData.ItemType[] itemType;
+    }
+
     [Header("Mouse Data")]
     public CursorHolder cursorHolder;
 
@@ -43,6 +54,9 @@ public class InventoryManager : MonoBehaviour
     void Start()
     {
         InitializeSlots();
+        InitializeWeaponSlots();
+        weaponManager.InitializeWeapon(holder[0]);
+
         inventoryHolder.SetActive(false);
 
         input = new PlayerInput();
@@ -88,6 +102,11 @@ public class InventoryManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    void InitializeWeaponSlots()
+    {
+        
     }
 
     public int AddItem(ItemData itemData, int itemAmount)
@@ -216,6 +235,11 @@ public class InventoryManager : MonoBehaviour
         }
 
         return itemAmount;
+    }
+
+    public void EquipWeapon()
+    {
+
     }
 
     public void PickUpDropItems(int SlotID, int holderID)

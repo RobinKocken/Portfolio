@@ -13,13 +13,11 @@ public class FirearmData : WeaponData
         singleshot,
         burst,
         automatic,
-        shotgun,
+        spread,
     }
 
     [Space]
     [Header("Firearm Data")]
-    public Vector3 localPlacmentPos;
-    public float baseDamage;
     public float raycastLength;
 
     [Space]

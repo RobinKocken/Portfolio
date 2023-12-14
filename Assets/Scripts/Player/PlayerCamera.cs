@@ -19,8 +19,8 @@ public class PlayerCamera : MonoBehaviour
     {
         input = new PlayerInput();
         input.Player.Enable();
-        input.Player.Mouse.performed += OnCamPerformed;
-        input.Player.Mouse.canceled += OnCamCancelled;
+        input.Player.Camera.performed += OnCamPerformed;
+        input.Player.Camera.canceled += OnCamCancelled;
     }
 
     void Update()
@@ -40,7 +40,7 @@ public class PlayerCamera : MonoBehaviour
 
     void FPCamera()
     {
-        mouse = input.Player.Mouse.ReadValue<Vector2>();
+        mouse = input.Player.Camera.ReadValue<Vector2>();
 
         xRotation += -mouse.y;
         yRotation += mouse.x;

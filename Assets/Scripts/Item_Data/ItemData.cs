@@ -19,7 +19,6 @@ public class ItemData : ScriptableObject
     [Space]
 
     public ItemType itemType;
-    public ItemRank itemRank;
 
     public enum ItemType
     {
@@ -30,14 +29,5 @@ public class ItemData : ScriptableObject
         craftable,
         consumable,
         junk,
-    }
-
-    public enum ItemRank
-    {
-        common,
-        uncommon,
-        rare,
-        epic,
-        legendary,
     }
 }

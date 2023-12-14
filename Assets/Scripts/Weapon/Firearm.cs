@@ -219,7 +219,7 @@ public class Firearm : Weapon
     {
         camTargetRotation += new Vector3(firearmData.camRecoil.x, Random.Range(-firearmData.camRecoil.y, firearmData.camRecoil.y), Random.Range(-firearmData.camRecoil.z, firearmData.camRecoil.z));
         firearmTargetRotation += new Vector3(firearmData.firearmRecoil.x, Random.Range(-firearmData.firearmRecoil.y, firearmData.firearmRecoil.y), Random.Range(-firearmData.firearmRecoil.z, firearmData.firearmRecoil.z));
-        firearmTargetPosition = new Vector3(firearmData.localPlacmentPos.x, firearmData.localPlacmentPos.y, firearmData.firearmRecoilBackUp + firearmData.localPlacmentPos.z);
+        firearmTargetPosition = new Vector3(firearmData.localPosition.x, firearmData.localPosition.y, firearmData.firearmRecoilBackUp + firearmData.localPosition.z);
     }
 
     void SetPosAndRot()
@@ -230,7 +230,7 @@ public class Firearm : Weapon
         firearmTargetRotation = Vector3.Lerp(firearmTargetRotation, Vector3.zero, firearmData.firearmReturnSpeed * Time.deltaTime);
         firearmCurrentRotation = Vector3.Lerp(firearmCurrentRotation, firearmTargetRotation, firearmData.firearmSnappiness * Time.deltaTime);
 
-        firearmTargetPosition = Vector3.Lerp(firearmTargetPosition, firearmData.localPlacmentPos, firearmData.backUpReturnSpeed * Time.deltaTime);
+        firearmTargetPosition = Vector3.Lerp(firearmTargetPosition, firearmData.localPosition, firearmData.backUpReturnSpeed * Time.deltaTime);
         firearmCurrentPosition = Vector3.Lerp(firearmCurrentPosition, firearmTargetPosition, firearmData.backUpSnappiness * Time.deltaTime);
 
         Camera.main.transform.localRotation = Quaternion.Euler(camCurrentRotation);
@@ -240,7 +240,7 @@ public class Firearm : Weapon
 
     void SetFirearmData()
     {
-        firearmCurrentPosition = firearmData.localPlacmentPos;
+        firearmCurrentPosition = firearmData.localPosition;
 
         damage = firearmData.baseDamage;
 

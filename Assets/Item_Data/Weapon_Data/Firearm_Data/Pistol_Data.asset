@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13ad3559d89710b4e920fe8d0bcba16b, type: 3}
+  m_Name: Pistol_Data
+  m_EditorClassIdentifier: 
+  itemName: Pistol
+  itemDescription: 
+  maxAmount: 1
+  prefab: {fileID: 7139682063787332855, guid: 762b948a10f0dc748a095ebb0e580356, type: 3}
+  icon: {fileID: 21300000, guid: 0abb8abe9b4b37348af9dccb45e8bf5b, type: 3}
+  itemType: 2
+  localPosition: {x: 0.2, y: -0.14, z: 0.08}
+  baseDamage: 35
+  fireMode: 0
+  localPlacmentPos: {x: 0.2, y: -0.14, z: 0.08}
+  baseDamage: 0
+  raycastLength: 0
+  baseMaxAmmo: 0
+  reloadTime: 0
+  baseSingleShotCooldown: 0
+  baseFireRate: 0
+  baseBurstAmount: 0
+  baseTimeBetweenBurst: 0
+  baseBurstCooldown: 0
+  swayClamp: 0
+  smoothing: 0
+  camRecoil: {x: 0, y: 0, z: 0}
+  camSnappiness: 0
+  camReturnSpeed: 0
+  firearmRecoil: {x: 0, y: 0, z: 0}
+  firearmSnappiness: 0
+  firearmReturnSpeed: 0
+  firearmRecoilBackUp: 0
+  backUpSnappiness: 0
+  backUpReturnSpeed: 0

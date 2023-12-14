@@ -5,5 +5,6 @@ using UnityEngine;
 public class WeaponData : ItemData
 {
     [Header("Weapon Data")]
-    public float damage;
+    public Vector3 localPosition;
+    public float baseDamage;
 }

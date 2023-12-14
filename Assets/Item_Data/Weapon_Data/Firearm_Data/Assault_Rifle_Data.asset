@@ -10,14 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 13ad3559d89710b4e920fe8d0bcba16b, type: 3}
-  m_Name: Firearm_Assault_Rifle_Data
+  m_Name: Assault_Rifle_Data
   m_EditorClassIdentifier: 
-  itemName: 
+  itemName: Assault
   itemDescription: 
+  maxAmount: 1
   prefab: {fileID: 8171764046199355216, guid: 7e5fd9290b08050469c624d014f9d561, type: 3}
+  icon: {fileID: 21300000, guid: 96c63b7832d663d47b3022ced65d9b1c, type: 3}
   itemType: 2
-  itemRank: 3
-  damage: 10
+  localPosition: {x: 0.2, y: -0.14, z: 0.08}
+  baseDamage: 20
   fireMode: 2
   localPlacmentPos: {x: 0.2, y: -0.14, z: 0.08}
   baseDamage: 25
